@@ -1,0 +1,24 @@
+public static void  loadBMIds(final MYCompleteListener completeListener) {
+//        g_bookmarkList.clear();
+        g_firestore.collection("USERS").document(FirebaseAuth.getInstance().getUid())
+                .collection("USER_DATA").document("BOOKMARKS")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        int count = myProfile.getBookmarkCount();
+
+                        for (int i = 0; i < count; i++) {
+                            String bmID = documentSnapshot.getString("BM" + String.valueOf(i+1)+ "_ID" );
+                            g_bookmarkList.add(bmID);
+                        }
+                        completeListener.onSuccess();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        completeListener.onFailure();
+                    }
+                });
+    }
