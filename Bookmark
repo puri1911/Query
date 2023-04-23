@@ -1,0 +1,45 @@
+public static void loadBookmarks(final MYCompleteListener completeListener) {
+
+        g_bookmarksList.clear();
+        tmp = 0;
+        loadBMIds(completeListener);
+        if (g_bookmarkList.size() == 0 )
+            completeListener.onSuccess();
+
+        for(int i=0; i < g_bookmarkList.size(); i++) {
+            String docID = g_bookmarkList.get(i);
+
+            g_firestore.collection("Questions").document(docID)
+                    .get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                            if (documentSnapshot.exists()) {
+                                g_bookmarksList.add(new QuestionModel(
+                                        documentSnapshot.getId(),
+                                        documentSnapshot.getString("QUESTION"),
+                                        documentSnapshot.getString("A"),
+                                        documentSnapshot.getString("B"),
+                                        documentSnapshot.getString("C"),
+                                        documentSnapshot.getString("D"),
+                                        documentSnapshot.getLong("ANSWER").intValue(),
+                                        0,
+                                        -1,
+                                        false
+                                ));
+                            }
+                            tmp++;
+                            if (tmp == g_bookmarkList.size()) {
+                                completeListener.onSuccess();
+                            }
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            completeListener.onFailure();
+                        }
+                    });
+        }
+    }
